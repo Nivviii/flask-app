@@ -14,22 +14,21 @@ pipeline {
                 sh 'python3 --version'
             }
         }
-
         stage('Install Dependencies') {
-
-            steps {
-
-                sh 'pip3 install -r requirements.txt'
+            steps{
+                sh'''
+                pip3 install --break-system-packages -r requirements.txt'''
             }
         }
-
+            }
+        }
         stage('Test') {
 
             steps {
 
                 echo 'Running Tests'
 
-                sh 'pytest'
+                sh 'python3 -m pytest'
             }
         }
     }
