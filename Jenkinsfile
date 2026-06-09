@@ -1,52 +1,45 @@
-
 pipeline {
-
     agent any
 
     stages {
-
         stage('Build') {
-
             steps {
-
                 echo 'Building Application'
-
                 sh 'python3 --version'
             }
         }
+
         stage('Install Dependencies') {
-            steps{
-                sh'''
-                pip3 install --break-system-packages -r requirements.txt'''
-            }
-        }
-            }
-        }
-        stage('Test') {
-
             steps {
+                echo 'Setting up Virtual Environment and Installing Dependencies'
+                sh '''
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                '''
+            }
+        }
 
+        stage('Test') {
+            steps {
                 echo 'Running Tests'
-
-                sh 'python3 -m pytest'
+                sh '''
+                . venv/bin/activate
+                pytest
+                '''
             }
         }
     }
 
     post {
-
         success {
-
             echo 'Build Successful'
         }
-
         failure {
-
             echo 'Build Failed'
         }
-
         always {
-
             echo 'Pipeline Finished'
         }
     }
