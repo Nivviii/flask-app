@@ -58,8 +58,8 @@ pipeline {
         stage('Push Image') {
             steps {
                 sh '''
-                docker tag flask-demo:v1 madasrushi0804/flask-demo:v1
-                docker push madasrushi0804/flask-demo:v1
+                docker tag flask-demo:v1 balanivetha15/flask-demo:v1
+                docker push balanivetha15/flask-demo:v1
                 '''
             }
         }
@@ -83,6 +83,33 @@ pipeline {
             }
         }
 
+        // ------------------------ New Stage ------------------------
+        stage('Deploy to Kubernetes') {
+            steps {
+                withCredentials([
+                    file(
+                        credentialsId: 'kubeconfig',
+                        variable: 'KUBECONFIG_FILE'
+                    )
+                ]) {
+                    sh '''
+                        export KUBECONFIG=$KUBECONFIG_FILE
+
+                        echo "Deploying Flask App to Kubernetes"
+
+                        kubectl apply -f k8s/
+
+                        kubectl rollout status deployment/flask-demo
+
+                        echo "Deployment Completed. Pods and Services:"
+
+                        kubectl get pods
+                        kubectl get svc
+                    '''
+                }
+            }
+        }
+        // -----------------------------------------------------------
     }
 
     post {
